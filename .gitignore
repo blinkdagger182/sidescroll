@@ -1,0 +1,25 @@
+.DS_Store
+
+# Xcode
+DerivedData/
+*.xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Swift Package Manager / Xcode package caches
+.build/
+LiveDoomscrollMVP/.derivedData/
+LiveDoomscrollMVP/.derivedData-sim/
+
+# Node
+node_modules/
+dist/
+npm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local editor state
+.vscode/

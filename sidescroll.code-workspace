@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Documents/GitHub/Signal-iOS"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"terminal.background": "#00000000",
+			"statusBar.noFolderBackground": "#551913",
+			"statusBar.noFolderForeground": "#FEFCFC"
+		}
+	}
+}
