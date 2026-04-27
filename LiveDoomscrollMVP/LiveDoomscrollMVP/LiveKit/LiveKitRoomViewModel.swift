@@ -52,6 +52,9 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
     super.init()
     room.add(delegate: self)
     room.localParticipant.add(delegate: self)
+    #if os(iOS)
+      BroadcastManager.shared.delegate = self
+    #endif
   }
 
   deinit {
@@ -103,15 +106,17 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
   func toggleScreenShare() {
     Task {
       do {
-        // On iOS this triggers LiveKit's ReplayKit flow. For full-device capture
-        // outside this app, add the Broadcast Upload Extension described in docs.
         if isScreenShareEnabled {
           #if os(iOS)
             BroadcastManager.shared.requestStop()
           #endif
           try await room.localParticipant.setScreenShare(enabled: false)
+          statusMessage = nil
         } else {
-          try await room.localParticipant.setScreenShare(enabled: true)
+          let publication = try await room.localParticipant.setScreenShare(enabled: true)
+          if publication == nil {
+            statusMessage = "Choose SideScroll Broadcast, then tap Start Broadcast."
+          }
         }
         refreshTracks()
       } catch {
@@ -273,6 +278,20 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
     screenShareSlot = primaryShare
   }
 }
+
+#if os(iOS)
+  extension LiveKitRoomViewModel: BroadcastManagerDelegate {
+    nonisolated func broadcastManager(didChangeState isBroadcasting: Bool) {
+      Task { @MainActor in
+        self.statusMessage = isBroadcasting
+          ? "Broadcast started. Open the app or page you want to share."
+          : nil
+        self.scheduleRefreshes()
+        self.refreshTracks()
+      }
+    }
+  }
+#endif
 
 extension LiveKitRoomViewModel: RoomDelegate {
   nonisolated func room(
