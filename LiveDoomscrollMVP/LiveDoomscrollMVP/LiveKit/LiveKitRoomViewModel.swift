@@ -51,6 +51,7 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
     self.tokenProvider = tokenProvider
     super.init()
     room.add(delegate: self)
+    room.localParticipant.add(delegate: self)
   }
 
   deinit {
@@ -146,6 +147,8 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
         )
       )
       callState = .connected
+      registerParticipantDelegates()
+      ensureRemoteVideoSubscriptions()
 
       do {
         try await room.localParticipant.setMicrophone(enabled: true)
@@ -162,10 +165,49 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
       }
 
       refreshTracks()
+      scheduleRefreshes()
     } catch {
       callState = .failed(error.localizedDescription)
       await room.disconnect()
       refreshTracks()
+    }
+  }
+
+  private func registerParticipantDelegates() {
+    room.localParticipant.add(delegate: self)
+    for participant in room.remoteParticipants.values {
+      participant.add(delegate: self)
+    }
+  }
+
+  private func ensureRemoteVideoSubscriptions() {
+    Task {
+      for participant in room.remoteParticipants.values {
+        for publication in participant.trackPublications.values {
+          guard let remotePublication = publication as? RemoteTrackPublication,
+            remotePublication.kind == .video
+          else { continue }
+
+          try? await remotePublication.set(subscribed: true)
+          try? await remotePublication.set(enabled: true)
+        }
+      }
+
+      await MainActor.run {
+        self.refreshTracks()
+      }
+    }
+  }
+
+  private func scheduleRefreshes() {
+    for delay in [0.25, 0.75, 1.5, 3.0] {
+      Task {
+        try? await Task.sleep(for: .seconds(delay))
+        await MainActor.run {
+          self.ensureRemoteVideoSubscriptions()
+          self.refreshTracks()
+        }
+      }
     }
   }
 
@@ -294,7 +336,10 @@ extension LiveKitRoomViewModel: RoomDelegate {
   nonisolated func room(
     _: Room, participant _: RemoteParticipant, didPublishTrack _: RemoteTrackPublication
   ) {
-    Task { @MainActor in self.refreshTracks() }
+    Task { @MainActor in
+      self.ensureRemoteVideoSubscriptions()
+      self.scheduleRefreshes()
+    }
   }
 
   nonisolated func room(
@@ -304,10 +349,45 @@ extension LiveKitRoomViewModel: RoomDelegate {
   }
 
   nonisolated func room(_: Room, participantDidConnect _: RemoteParticipant) {
-    Task { @MainActor in self.refreshTracks() }
+    Task { @MainActor in
+      self.registerParticipantDelegates()
+      self.ensureRemoteVideoSubscriptions()
+      self.refreshTracks()
+    }
   }
 
   nonisolated func room(_: Room, participantDidDisconnect _: RemoteParticipant) {
+    Task { @MainActor in self.refreshTracks() }
+  }
+}
+
+extension LiveKitRoomViewModel: ParticipantDelegate {
+  nonisolated func participant(_: RemoteParticipant, didPublishTrack _: RemoteTrackPublication) {
+    Task { @MainActor in
+      self.ensureRemoteVideoSubscriptions()
+      self.scheduleRefreshes()
+    }
+  }
+
+  nonisolated func participant(_: RemoteParticipant, didSubscribeTrack _: RemoteTrackPublication) {
+    Task { @MainActor in self.refreshTracks() }
+  }
+
+  nonisolated func participant(_: RemoteParticipant, didUnsubscribeTrack _: RemoteTrackPublication) {
+    Task { @MainActor in self.refreshTracks() }
+  }
+
+  nonisolated func participant(
+    _: Participant, trackPublication _: TrackPublication, didUpdateIsMuted _: Bool
+  ) {
+    Task { @MainActor in self.refreshTracks() }
+  }
+
+  nonisolated func participant(
+    _: RemoteParticipant,
+    trackPublication _: RemoteTrackPublication,
+    didUpdateStreamState _: StreamState
+  ) {
     Task { @MainActor in self.refreshTracks() }
   }
 }
