@@ -48,6 +48,11 @@ app.get("/health", async () => ({
   version: serviceVersion,
 }));
 
+app.get("/", async () => ({
+  ok: true,
+  service: "sidescroll-livekit-token-backend",
+}));
+
 app.get("/v1/livekit/config", async () => ({
   liveKitUrl: env.LIVEKIT_URL,
   roomPrefix: env.ROOM_PREFIX,
