@@ -22,7 +22,7 @@ This MVP is isolated under `LiveDoomscrollMVP`.
 
 ## Required Values
 
-- `LiveKitTestConfig.backendURL`: token backend URL, for example `https://api.sidescroll.example.com`.
+- `LiveKitTestConfig.backendURL`: token backend URL. The current Coolify MVP URL is `http://pqiqkehqtiwtl8dqbt90usbn.5.223.92.119.sslip.io`.
 - Backend env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
 
 The backend is in `backend/` and is ready for Coolify Dockerfile deployment.

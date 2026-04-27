@@ -23,7 +23,15 @@ TOKEN_TTL_SECONDS=7200
 ROOM_PREFIX=doomscroll
 ```
 
-After deployment, set `LiveKitTestConfig.backendURL` in the iOS app to the public HTTPS URL Coolify assigns to this service.
+After deployment, set `SIDESCROLL_BACKEND_URL` in the iOS app target build settings to the public URL Coolify assigns to this service.
+
+Current MVP deployment:
+
+```text
+http://pqiqkehqtiwtl8dqbt90usbn.5.223.92.119.sslip.io
+```
+
+This temporary generated domain is HTTP-only in the current Coolify setup, so the iOS app includes a narrow ATS exception for this exact host. Replace it with a real HTTPS API domain before TestFlight or production distribution.
 
 ## Coolify MCP
 

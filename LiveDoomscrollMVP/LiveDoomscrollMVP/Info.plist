@@ -24,6 +24,19 @@
 	<string>Live Doomscroll uses your camera for room video bubbles.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Live Doomscroll uses your microphone for room audio.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>pqiqkehqtiwtl8dqbt90usbn.5.223.92.119.sslip.io</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>RTCAppGroupIdentifier</key>
 	<string>group.com.riskcreatives.sidescroll</string>
 	<key>RTCScreenSharingExtension</key>

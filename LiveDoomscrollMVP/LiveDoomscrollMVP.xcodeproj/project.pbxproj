@@ -369,6 +369,7 @@
 				CODE_SIGN_ENTITLEMENTS = LiveDoomscrollMVP/LiveDoomscrollMVP.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.riskcreatives.sidescroll;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SIDESCROLL_BACKEND_URL = "http://pqiqkehqtiwtl8dqbt90usbn.5.223.92.119.sslip.io";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -395,6 +396,7 @@
 				CODE_SIGN_ENTITLEMENTS = LiveDoomscrollMVP/LiveDoomscrollMVP.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.riskcreatives.sidescroll;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SIDESCROLL_BACKEND_URL = "http://pqiqkehqtiwtl8dqbt90usbn.5.223.92.119.sslip.io";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
