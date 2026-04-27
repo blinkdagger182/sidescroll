@@ -80,6 +80,17 @@ struct CallRoomView: View {
       }
 
       VStack(spacing: 18) {
+        if let statusMessage = viewModel.statusMessage {
+          Text(statusMessage)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.white.opacity(0.78))
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.white.opacity(0.12), in: Capsule())
+        }
+
         cameraBubbles
 
         CallControlsView(

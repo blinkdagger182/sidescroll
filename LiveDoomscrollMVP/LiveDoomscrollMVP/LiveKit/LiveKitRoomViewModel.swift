@@ -41,6 +41,7 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
   @Published private(set) var isCameraEnabled = false
   @Published private(set) var isScreenShareEnabled = false
   @Published private(set) var lastReaction: String?
+  @Published private(set) var statusMessage: String?
 
   private let room: Room
   private let tokenProvider: RoomTokenProviding
@@ -144,10 +145,22 @@ final class LiveKitRoomViewModel: NSObject, ObservableObject {
           defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(appAudio: true)
         )
       )
-      try await room.localParticipant.setCamera(enabled: true)
-      try await room.localParticipant.setMicrophone(enabled: true)
-
       callState = .connected
+
+      do {
+        try await room.localParticipant.setMicrophone(enabled: true)
+      } catch {
+        statusMessage = "Mic unavailable: \(error.localizedDescription)"
+      }
+
+      do {
+        try await room.localParticipant.setCamera(enabled: true)
+      } catch {
+        // iOS Simulator commonly has no camera capture device. Keep the
+        // participant connected so it can still receive remote video.
+        statusMessage = "Camera unavailable: \(error.localizedDescription)"
+      }
+
       refreshTracks()
     } catch {
       callState = .failed(error.localizedDescription)
